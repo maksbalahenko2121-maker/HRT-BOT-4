@@ -340,7 +340,13 @@ def get_user(user_id, username=""):
 
         clean_name = username or "Без_ника"
 
-        cur.execute("INSERT INTO users (user_id, username, notified) VALUES (?, ?, 1)", (user_id, clean_name))
+        cur.execute(
+
+            "INSERT INTO users (user_id, username, notified) VALUES (?, ?, 1)",
+
+            (user_id, clean_name)
+
+        )
 
         db.commit()
 
@@ -350,7 +356,13 @@ def get_user(user_id, username=""):
 
     if username and old_uname != username:
 
-        cur.execute("UPDATE users SET username = ? WHERE user_id = ?", (username, user_id))
+        cur.execute(
+
+            "UPDATE users SET username = ? WHERE user_id = ?",
+
+            (username, user_id)
+
+        )
 
         db.commit()
 
