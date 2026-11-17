@@ -686,7 +686,9 @@ def get_top_text():
 
 def get_ref_text(uid: int, bot_username: str):
 
-    ref_link = f"https://t.me{bot_username}?start={uid}"
+    clean_bot = (bot_username or "").replace("@", "").strip()
+
+    ref_link = f"https://t.me{clean_bot}?start={uid}"
 
     cur.execute("SELECT COUNT(*) FROM referrals WHERE referrer_id = ? AND rewarded = 1", (uid,))
 
@@ -698,7 +700,7 @@ def get_ref_text(uid: int, bot_username: str):
 
  
 
-    return (
+    text = (
 
         f"╭── 👥 <b>АКАДЕМИЯ СЕНСЕЯ</b> ──╮\n"
 
@@ -716,11 +718,13 @@ def get_ref_text(uid: int, bot_username: str):
 
         f"2. Когда он зайдёт и впервые нажмёт <b>«⚡ Впитать энергию»</b> — тебе автоматически упадут <b>+50⚡</b>!\n\n"
 
-        f"🔗 <b>Твоя ссылка (нажми, чтобы скопировать):</b>\n"
+        f"🔗 <b>Твоя ссылка (нажми на неё или на кнопку ниже):</b>\n"
 
-        f"<code>{ref_link}</code>"
+        f"{ref_link}"
 
     )
+
+    return text, ref_link
 
  
 
@@ -1017,9 +1021,19 @@ async def cmd_ref_text(message: types.Message):
 
     bot_info = await bot.get_me()
 
-    kb = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="🎴 Моя карточка", callback_data=f"back_{uid}")]])
+    text, ref_link = get_ref_text(uid, bot_info.username)
 
-    await message.answer(get_ref_text(uid, bot_info.username), parse_mode="HTML", reply_markup=kb)
+    share_url = f"https://t.me{ref_link}&text=Залетай в Аниме-Качалку! Качай героев и забирай NFT-подарки!"
+
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+
+        [InlineKeyboardButton(text="📤 Отправить ссылку другу", url=share_url)],
+
+        [InlineKeyboardButton(text="🎴 Моя карточка", callback_data=f"back_{uid}")]
+
+    ])
+
+    await message.answer(text, parse_mode="HTML", reply_markup=kb)
 
  
 
@@ -1839,9 +1853,19 @@ async def cb_ref(call: types.CallbackQuery):
 
     bot_info = await bot.get_me()
 
-    kb = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="⬅️ Вернуться к герою", callback_data=f"back_{target_id}")]])
+    text, ref_link = get_ref_text(target_id, bot_info.username)
 
-    await send_or_edit_screen(call.message, get_ref_text(target_id, bot_info.username), kb, photo_id="", is_edit=True)
+    share_url = f"https://t.me{ref_link}&text=Залетай в Аниме-Качалку! Качай героев и забирай NFT-подарки!"
+
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+
+        [InlineKeyboardButton(text="📤 Отправить ссылку другу", url=share_url)],
+
+        [InlineKeyboardButton(text="⬅️ Вернуться к герою", callback_data=f"back_{target_id}")]
+
+    ])
+
+    await send_or_edit_screen(call.message, text, kb, photo_id="", is_edit=True) 
 
  
 
