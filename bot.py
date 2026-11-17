@@ -797,7 +797,7 @@ def check_owner(call: types.CallbackQuery, target_id: int):
 
 
 
-  @dp.message(Command("start"))
+@dp.message(Command("start"))
 
 async def cmd_start(message: types.Message):
 
