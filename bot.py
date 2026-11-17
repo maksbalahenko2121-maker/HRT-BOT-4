@@ -807,7 +807,7 @@ async def cmd_start(message: types.Message):
 
     if len(parts) == 2:
 
-        _, ref_code = parts
+         ref_code = parts[1].strip() 
 
         if ref_code.isdigit():
 
